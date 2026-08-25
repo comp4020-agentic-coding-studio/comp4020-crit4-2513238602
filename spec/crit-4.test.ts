@@ -20,6 +20,7 @@ describe("C4 instrument contracts", () => {
   it("offers one focusable surface for pointer, touch and keyboard play", () => {
     const instrument = doc.querySelector<HTMLElement>("#instrument");
     expect(instrument?.getAttribute("tabindex")).toBe("0");
+    expect(instrument?.getAttribute("role")).toBe("group");
     expect(instrument?.getAttribute("data-inputs")).toContain("pointer");
     expect(instrument?.getAttribute("data-inputs")).toContain("touch");
     expect(instrument?.getAttribute("data-inputs")).toContain("keyboard");

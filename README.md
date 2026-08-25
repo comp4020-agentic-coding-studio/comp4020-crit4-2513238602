@@ -1,68 +1,57 @@
-# COMP4020 static prototype template
+# Ripple Garden
 
-A starter template for static-site prototypes in **COMP4020 / COMP8020 Agentic
-Coding Studio**. The course provisions a repo from this template for each
-deliverable --- you don't create it yourself. The `start` course skill clones it
-for you; from there, build your prototype and deploy it to GitHub Pages.
+[![Checks and deploy](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-2513238602/actions/workflows/checks.yml/badge.svg)](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-2513238602/actions/workflows/checks.yml)
 
-## CI and Pages only turn on when you ship
+Ripple Garden is a browser instrument for COMP4020 C4. A player touches a dark
+pool and shapes live synthesised sound through position, movement and duration.
+There is no tune to reproduce, score to chase or wrong place to begin.
 
-Your repo starts private, and both CI jobs (`check` and `deploy`) are gated on
-it being public. While private, a push to `main` runs nothing in CI ---
-`pnpm check` (below) is your feedback loop until then. When you're ready, the
-course's `/ship` skill flips the repo public, turns on GitHub Pages, and
-dispatches the deploy for you; there's nothing to configure in the Pages
-settings yourself. From that point, every push to `main` builds and deploys, and
-the deploy step prints your live URL and checks it returns 200.
+- [Play Ripple Garden](https://comp4020-agentic-coding-studio.github.io/comp4020-crit4-2513238602/)
+- [Read the process evidence](PROCESS.md)
+- [Read the C4 reflection](reflections/crit-4.md)
 
-## What gets marked
+## Play
 
-The deployed site is the deliverable, assessed live in Chrome at two fixed
-viewports --- see the course website's
-[assessment page](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#marking-environment)
-for the details.
+- **Touch or click** anywhere to begin a voice.
+- **Hold and wander** to move through the pentatonic pool; across chooses pitch,
+  depth changes colour, and faster movement brightens the sound.
+- **Use A–K** to play the same range from a keyboard.
+- **Use ↑ and ↓** to shift the keyboard voice between bright and deep.
+- **Use several fingers or keys** to make chords.
 
-## Quick start
+The first player gesture creates and resumes the `AudioContext`, so the page is
+silent until somebody plays. Voices share one bounded master chain, and every
+oscillator is released even when a first tap ends while the context is waking.
+
+## Design and implementation
+
+The interface makes one promise on arrival — “Touch the water” — and places a
+pulsing drop in the playable surface. The visual and sound mappings agree:
+ripples appear where a voice begins and follow a moving gesture. A single input
+model serves mouse, touch and keyboard, so each path produces the same musical
+logic instead of becoming a separate mode.
+
+The instrument uses plain HTML, CSS and strict TypeScript on Vite. Web Audio
+oscillators feed a filtered voice envelope, stereo position, a restrained echo
+and a compressed master output. Pure functions keep the pentatonic, colour,
+gain and movement mappings testable without pretending that a test suite can
+judge whether the result sounds good.
+
+Accessibility and resilience include a labelled keyboard-focusable instrument,
+visible focus, a skip link, semantic landmarks, reduced-motion support, safe
+gain limits, a simultaneous-voice cap and responsive layouts for the course's
+1920 × 1080 and 390 × 844 marking viewports.
+
+## Run locally
 
 ```sh
-mise install       # supported path: install the template's Node and pnpm
 pnpm install
-pnpm dev             # local dev server
-pnpm check           # most of what CI runs (links, secrets and deploy are CI-only)
-pnpm check:evidence  # the process-evidence check CI runs before you ship
-pnpm build           # produce dist/ (what gets deployed)
-
-# reproduce CI's links check before you push
+pnpm dev
+pnpm check
+pnpm check:evidence
+pnpm build
 pnpm dlx linkinator ./dist --silent --skip "^https?://(?!localhost|127)"
 ```
 
-`mise` is the course's recommended runtime manager. If you use another manager
-or the official installers, that is fine: provide the Node and pnpm versions in
-`mise.toml`, then run the same commands. Tutor support reproduces runtime
-problems with mise.
-
-## What's here
-
-- `index.html`, `styles.css`, `main.ts` --- a minimal starting site. Replace it.
-- `mise.toml` --- the tested Node and pnpm versions for this template.
-- `spec/` --- what the checks are for (`README.md`), the shipped invariants
-  (`invariants.test.ts`), and a replaceable starter test (`starter.test.ts`);
-  the spec tests you write live alongside them.
-- `CLAUDE.md` --- orients whoever works in this repo, you or a coding agent:
-  what the checks mean and how to work here. Yours to grow.
-- `PROCESS.md` --- a template for your process overview, showing the
-  cited-moment format. Replace it with your own; `pnpm check:evidence` verifies
-  your citations resolve.
-- `.github/workflows/checks.yml` --- the CI sensors that run on every push once
-  your repo is public, and the GitHub Pages deploy.
-- `.githooks/pre-commit` --- blocks any commit that contains something shaped
-  like an API key, so your COMP4020 key can't end up in a public repo. Installed
-  automatically by `pnpm install`.
-
-This template is SSG-agnostic: plain HTML/CSS/TypeScript on Vite, so you can add
-Astro, Eleventy, or any static generator later without changing how it deploys.
-The course plugin's `stack` skill performs the swap for you — to the course
-default (Astro) or bare HTML/CSS — with the Pages base path, lockfile, and CI
-link check handled.
-
-See the course site for how the checks map to each week of the course.
+`pnpm check` runs strict type checking, the production build, the starter
+invariants, the C4 contracts and the music-mapping tests.
