@@ -14,6 +14,8 @@ export class RippleAudioEngine {
   private context: AudioContext | null = null;
   private input: GainNode | null = null;
   private voices = new Map<string, Voice>();
+  private starting = new Set<string>();
+  private pendingReleases = new Set<string>();
 
   get isSupported(): boolean {
     return "AudioContext" in window || "webkitAudioContext" in window;
@@ -65,8 +67,13 @@ export class RippleAudioEngine {
   }
 
   async startVoice(id: string, parameters: SoundParameters): Promise<void> {
+    if (this.voices.has(id) || this.starting.has(id)) return;
+    this.pendingReleases.delete(id);
+    this.starting.add(id);
+
     const context = await this.ensureContext();
     const input = this.input;
+    this.starting.delete(id);
     if (!context || !input || this.voices.has(id)) return;
 
     while (this.voices.size >= MAX_VOICES) {
@@ -116,6 +123,12 @@ export class RippleAudioEngine {
     this.voices.set(id, voice);
     fundamental.start(now);
     shimmer.start(now);
+
+    // A first tap can end while AudioContext.resume() is still pending. Let it
+    // bloom into a short drop instead of losing the sound or leaking a voice.
+    if (this.pendingReleases.delete(id)) {
+      this.stopVoice(id, 0.28, 0.075);
+    }
   }
 
   updateVoice(id: string, parameters: SoundParameters, movement = 0): void {
@@ -145,18 +158,22 @@ export class RippleAudioEngine {
     );
   }
 
-  stopVoice(id: string, release = 0.24): void {
+  stopVoice(id: string, release = 0.24, delay = 0): void {
     const voice = this.voices.get(id);
     const context = this.context;
-    if (!voice || !context || voice.stopped) return;
+    if (!voice || !context) {
+      if (this.starting.has(id)) this.pendingReleases.add(id);
+      return;
+    }
+    if (voice.stopped) return;
 
     voice.stopped = true;
     this.voices.delete(id);
     const now = context.currentTime;
-    const end = now + release;
+    const releaseStart = now + delay;
+    const end = releaseStart + release;
 
-    voice.gain.gain.cancelScheduledValues(now);
-    voice.gain.gain.setValueAtTime(Math.max(voice.gain.gain.value, 0.0001), now);
+    voice.gain.gain.cancelAndHoldAtTime(releaseStart);
     voice.gain.gain.exponentialRampToValueAtTime(0.0001, end);
 
     for (const oscillator of voice.oscillators) {
@@ -165,6 +182,9 @@ export class RippleAudioEngine {
   }
 
   stopAll(): void {
+    for (const id of this.starting) {
+      this.pendingReleases.add(id);
+    }
     for (const id of [...this.voices.keys()]) {
       this.stopVoice(id, 0.08);
     }

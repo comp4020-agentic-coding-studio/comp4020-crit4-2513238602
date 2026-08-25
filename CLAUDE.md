@@ -7,7 +7,8 @@
 - Pointer, touch and keyboard are equal input paths into the same music
   mapping. A change for one path must not leave the others behind.
 - Keep every output gain bounded, cap simultaneous voices, and release every
-  oscillator. Fast or multi-touch play must stay safe.
+  oscillator. Fast or multi-touch play must stay safe, including a pointer-up
+  that arrives while the first `AudioContext.resume()` is still pending.
 - Keep music mappings as pure functions in `src/music-mapping.ts` so their
   ranges and boundaries remain mechanically checkable.
 - TypeScript named callbacks do not retain an outer `querySelector` narrowing.
