@@ -1,5 +1,21 @@
 # COMP4020 prototype
 
+## Ripple Garden contracts
+
+- Sound is synthesised live with one lazily-created `AudioContext`; never add a
+  backing track or start audio before a player gesture.
+- Pointer, touch and keyboard are equal input paths into the same music
+  mapping. A change for one path must not leave the others behind.
+- Keep every output gain bounded, cap simultaneous voices, and release every
+  oscillator. Fast or multi-touch play must stay safe.
+- Keep music mappings as pure functions in `src/music-mapping.ts` so their
+  ranges and boundaries remain mechanically checkable.
+- TypeScript named callbacks do not retain an outer `querySelector` narrowing.
+  After a shared DOM guard, rebind the nodes to non-null constants; do not use
+  non-null assertions to silence the compiler.
+- Sound quality, latency and expressive feel require a human listening pass.
+  Green checks cannot settle those claims.
+
 Your starter repo for a COMP4020 prototype: a static site in HTML/CSS/TypeScript
 that builds to plain HTML/CSS/JS and deploys to GitHub Pages. The deployed site
 is what gets marked, not this repo.

@@ -3,17 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 prototype</title>
+    <title>Ripple Garden — play the water</title>
     <meta
       name="description"
-      content="Replace this with one sentence saying what this page is. A search result and a link preview both show it."
+      content="A browser instrument where touch, movement and position turn a dark pool into ripples of live sound."
     />
-
-    <!--
-      The link-preview card: public/card.png, 1200x630 --- replace it. The URL
-      resolves against this page, like any link. No og:title/og:description:
-      scrapers fall back to the <title> and description above.
-    -->
+    <meta name="theme-color" content="#071417" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./card.png" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -21,18 +16,76 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header>
+    <a class="skip-link" href="#instrument">Skip to the instrument</a>
+
+    <header class="site-header">
       <nav aria-label="Primary">
-        <a href="./">Home</a>
+        <a class="wordmark" href="#instrument" aria-label="Ripple Garden, return to instrument">
+          <span class="wordmark-mark" aria-hidden="true"></span>
+          Ripple Garden
+        </a>
+        <a class="about-link" href="#about">How it listens</a>
       </nav>
     </header>
+
     <main>
-      <h1>COMP4020 prototype</h1>
-      <p data-testid="intro">
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
-      </p>
+      <section class="instrument-shell" aria-labelledby="page-title">
+        <div class="title-block">
+          <p class="eyebrow">A small instrument for restless hands</p>
+          <h1 id="page-title">Touch the water.</h1>
+          <p class="title-translation" lang="zh-Hans">触碰水面</p>
+        </div>
+
+        <div
+          id="instrument"
+          class="play-surface"
+          tabindex="0"
+          aria-label="Ripple Garden musical instrument. Touch, click, drag, or use the A to K keys to play."
+          aria-describedby="gesture-hint keyboard-hint"
+          data-instrument="web-audio"
+          data-inputs="pointer touch keyboard"
+        >
+          <div class="water-light water-light-one" aria-hidden="true"></div>
+          <div class="water-light water-light-two" aria-hidden="true"></div>
+          <div id="ripple-layer" class="ripple-layer" aria-hidden="true"></div>
+
+          <div class="first-invitation" aria-hidden="true">
+            <span class="drop"></span>
+            <span class="invitation-ring"></span>
+          </div>
+
+          <p id="gesture-hint" class="gesture-hint">Press, hold, wander.</p>
+          <p id="keyboard-hint" class="keyboard-hint">
+            <span><kbd>A</kbd>—<kbd>K</kbd> play</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> shift depth</span>
+          </p>
+
+          <div class="depth-scale" aria-hidden="true">
+            <span>bright</span>
+            <span>deep</span>
+          </div>
+          <output id="audio-status" class="sr-only" aria-live="polite">The water is waiting.</output>
+        </div>
+      </section>
+
+      <section id="about" class="about" aria-labelledby="about-title">
+        <div>
+          <p class="eyebrow">How it listens</p>
+          <h2 id="about-title">Every gesture leaves a different wake.</h2>
+        </div>
+        <div class="about-notes">
+          <p><strong>Across</strong> chooses the note.</p>
+          <p><strong>Down</strong> softens its colour.</p>
+          <p><strong>Movement</strong> bends and brightens it.</p>
+        </div>
+        <p class="no-rules">No score. No wrong notes. Start anywhere.</p>
+      </section>
     </main>
+
+    <footer>
+      <p>An unofficial COMP4020 studio experiment · Sound is made live in your browser.</p>
+    </footer>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
